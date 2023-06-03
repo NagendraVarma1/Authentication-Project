@@ -4,7 +4,7 @@ import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -19,37 +19,47 @@ const AuthForm = () => {
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
-    setIsLoading(true)
-
+    setIsLoading(true);
+    let url;
     if (isLogin) {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC3m7TaFH0g6HfvWkll_-1VYNuNo1t5sV4";
     } else {
-      fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC3m7TaFH0g6HfvWkll_-1VYNuNo1t5sV4",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: enteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((res) => {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC3m7TaFH0g6HfvWkll_-1VYNuNo1t5sV4";
+    }
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        email: enteredEmail,
+        password: enteredPassword,
+        returnSecureToken: true,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        setIsLoading(false);
         if (res.ok) {
-          setIsLoading(false)
+          return res.json();
         } else {
           return res.json().then((data) => {
-            let errorMessage = 'Authentication failed!';
-            if(data && data.error && data.error.message){
-              errorMessage = data.error.message;
-            }
-            alert(errorMessage)
+            let errorMessage = "Authentication failed!";
+            // if(data && data.error && data.error.message){
+            //   errorMessage = data.error.message;
+            // }
+            throw new Error(errorMessage);
           });
         }
+      })
+      .then((data) => {
+        localStorage.setItem(enteredEmail, data.idToken)
+        console.log(data)
+      })
+      .catch((err) => {
+        alert(err.message);
       });
-    }
   };
 
   return (
@@ -70,8 +80,10 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-          {isLoading && <p>Sending Request</p> }
-          {!isLoading && <button>{isLogin ? 'Login' : 'Create Account'}</button>}
+          {isLoading && <p>Sending Request</p>}
+          {!isLoading && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
           <button
             type="button"
             className={classes.toggle}
