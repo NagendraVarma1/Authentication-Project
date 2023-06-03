@@ -13,9 +13,9 @@ function App() {
   return (
     <Layout>
       <Switch>
-        <Route path="/" exact>
+        {authCtx.loggedIn && <Route path="/" exact>
           <HomePage />
-        </Route>
+        </Route>}
         {!authCtx.loggedIn && <Route path="/auth">
           <AuthPage />
         </Route>}

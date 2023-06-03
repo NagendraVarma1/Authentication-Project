@@ -1,20 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AuthContext from "./auth-context";
 
 const AuthProvider = (props) => {
-  const initialToken = localStorage.getItem('token')
+  const initialToken = localStorage.getItem("token");
   const [token, setToken] = useState(initialToken);
 
-  const userIsLoggedIn = !!token
+  let userIsLoggedIn = !!token;
+
+  const autoLogoutHandler = () => {
+    setTimeout(() => {
+      setToken(null);
+      console.log("testing");
+      localStorage.removeItem("token");
+    }, 60000*5);
+  };
+ 
+
+  useEffect(() => {
+    if (userIsLoggedIn) {
+      autoLogoutHandler();
+    }
+  }, [userIsLoggedIn]);
 
   const logInHandler = (token) => {
     setToken(token);
-    localStorage.setItem('token', token)
+    localStorage.setItem("token", token);
   };
 
   const logOutHandler = () => {
     setToken(null);
-    localStorage.removeItem('token')
+    localStorage.removeItem("token");
   };
 
   const authContext = {
