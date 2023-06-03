@@ -16,8 +16,6 @@ const AuthProvider = (props) => {
     localStorage.removeItem('token')
   };
 
-  console.log(token)
-
   const authContext = {
     token: token,
     loggedIn: userIsLoggedIn,
